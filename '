@@ -1,0 +1,14 @@
+import numpy as np
+
+
+class Pendulum:
+
+    def __init__(self, length, initialXY, theta, mass):
+        self.mass = mass
+        self.moment = np.array(length * np.cos(theta), 
+                               length * np.sin(theta)) - initialXY
+        self.length = length
+        self.acceleration = 0
+        self.velocity = 0
+
+    def get_tension(self)
