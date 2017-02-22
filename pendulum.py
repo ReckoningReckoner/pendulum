@@ -39,23 +39,24 @@ class Pendulum:
 
     def tension(self):
         tension_mag = self.mass * g * np.cos(self.theta)\
-                      - self.mass *\
+                      + self.mass *\
                       norm(self.velocity) ** 2/self.length
 
-        print("Grav", self.mass * g * np.cos(self.theta))
-        print("Tension", tension_mag)
-        print("Cent", self.mass * norm(self.velocity)**2 / self.length)
-        return tension_mag * -self.moment/norm(self.moment)
+        # print("Grav", self.mass * g * np.cos(self.theta))
+        # print("Tension", tension_mag)
+        # print("Cent", self.mass * norm(self.velocity)**2 / self.length)
+        return np.abs(tension_mag) * -self.moment/norm(self.moment)
 
     def update_acceleration(self, dt):
         gravity = self.gravity()
         tension = self.tension()
         net_force = gravity + tension
         self.acceleration = net_force/self.mass
+        print(self.acceleration)
 
     def update_velocity(self, dt):
         self.velocity += self.acceleration * dt
-        print("Velocity", norm(self.velocity))
+        # print("Velocity", norm(self.velocity))
 
     def update_position(self, dt):
         self.moment += self.velocity * dt
@@ -67,16 +68,16 @@ class Pendulum:
             self.theta *= -1
 
     def update_velocity_and_position(self, dt):
-        print("Old Moment", self.moment)
-        print("Old Theta", np.rad2deg(self.theta))
-        print("length/moment", self.length/norm(self.moment))
+        # print("Old Moment", self.moment)
+        # print("Old Theta", np.rad2deg(self.theta))
+        # print("length/moment", self.length/norm(self.moment))
 
         self.update_moment()
         self.update_acceleration(dt)
         self.update_velocity(dt)
         self.update_position(dt)
 
-        print("New Moment", self.moment)
-        print("Moment X", self.moment[0])
-        print("Moment y", self.moment[1])
-        print("New Theta", np.rad2deg(self.theta))
+        # print("New Moment", self.moment)
+        # print("Moment X", self.moment[0])
+        # print("Moment y", self.moment[1])
+        # print("New Theta", np.rad2deg(self.theta))

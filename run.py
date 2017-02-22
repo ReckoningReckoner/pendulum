@@ -14,7 +14,7 @@ ts = []
 p1theta = []
 p1v = []
 p2theta = []
-while t < 1.2:
+while t < 10:
     print("_____")
     print("t = ", t)
     ts.append(t)
@@ -26,8 +26,7 @@ while t < 1.2:
     # p2theta.append(p2.theta)
     t += dt
 
-# plt.plot(ts, p1theta, label="p1")
-plt.plot(ts, p1v, label="p1")
+plt.plot(ts, p1theta, label="p1")
 # plt.plot(ts, p2theta, label="p2")
 plt.legend()
 plt.show()
