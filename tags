@@ -1,0 +1,27 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Pendulum	pendulum.py	/^class Pendulum:$/;"	c
+Pendulum	run.py	/^from pendulum import Pendulum$/;"	i
+__init__	pendulum.py	/^    def __init__(self, length, theta, mass):$/;"	m	class:Pendulum
+add_forces	pendulum.py	/^    def add_forces(self, *forces):$/;"	m	class:Pendulum
+dt	run.py	/^dt = 0.01$/;"	v
+g	pendulum.py	/^from scipy.constants import g$/;"	i
+gravity	pendulum.py	/^    def gravity(self):$/;"	m	class:Pendulum
+matplotlib	run.py	/^import matplotlib.pyplot as plt$/;"	i
+moment	pendulum.py	/^    def moment(self):$/;"	m	class:Pendulum
+np	pendulum.py	/^import numpy as np$/;"	i
+np	run.py	/^import numpy as np$/;"	i
+plt	run.py	/^import matplotlib.pyplot as plt$/;"	i
+simple	run.py	/^simple = Pendulum(1, np.pi\/2, 10)$/;"	v
+simple2	run.py	/^simple2 = Pendulum(1, np.pi\/2, 10)$/;"	v
+t	run.py	/^t = 0$/;"	v
+tension	pendulum.py	/^    def tension(self):$/;"	m	class:Pendulum
+thetas	run.py	/^thetas = []$/;"	v
+ts	run.py	/^ts = []$/;"	v
+update_position	pendulum.py	/^    def update_position(self, dt):$/;"	m	class:Pendulum
+update_velocity	pendulum.py	/^    def update_velocity(self, dt):$/;"	m	class:Pendulum
+update_velocity_and_position	pendulum.py	/^    def update_velocity_and_position(self, dt):$/;"	m	class:Pendulum
