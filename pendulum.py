@@ -41,33 +41,35 @@ from numpy import sin, cos
 from constants import g
 
 
-def set_initial_conditions(theta, initial_angle, initial_omega, time_step):
+def _set_initial_conditions(theta, initial_angle, initial_omega, time_step):
     theta[:, 1] = np.deg2rad(initial_angle[:])
     theta[:, 0] = theta[:, 1] - initial_omega[:] * time_step
 
 
-def dterm_2nddiff(theta, i):
+def _dterm_2nddiff(theta, i):
     return -2*theta[i] + theta[i-1]
 
 
-def dterm_1stdiff(theta, i):
+def _dterm_1stdiff(theta, i):
     return (theta[i] - theta[i-1])**2
 
 
 def _d_term(theta1, theta2, a, i):
-    return a[0] * dterm_2nddiff(theta1, i)\
-            + a[1] * dterm_2nddiff(theta2, i)\
-            + a[2] * dterm_1stdiff(theta2, i)\
+    return a[0] * _dterm_2nddiff(theta1, i)\
+            + a[1] * _dterm_2nddiff(theta2, i)\
+            + a[2] * _dterm_1stdiff(theta2, i)\
             + a[3]
 
 
 def simulate(time_start, time_end, initial_angles,
              initial_omegas, mass, length, number_of_points):
-
+    """
+    Simulate the double pendulum with the given IC's
+    """
     theta = np.zeros((2, number_of_points))
     times = np.linspace(time_start, time_end, number_of_points)
     time_step = (time_start + time_end)/number_of_points
-    set_initial_conditions(theta, initial_angles, initial_omegas, time_step)
+    _set_initial_conditions(theta, initial_angles, initial_omegas, time_step)
 
     a = np.zeros(4)
     b = np.zeros(4)
