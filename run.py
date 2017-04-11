@@ -7,28 +7,29 @@ a0 * theta1_tt + a1 * theta0_tt + a2 * theta0_t**2 + a3 = 0
 b0 * theta0_tt + b1 * theta1_tt + b2 * theta1_t**2 + b3
 
 where:
-a[0] = mass[1]*length[1]**2
-a[1] = mass[1]*length[0] * cos(theta[0][i] - theta[1][i])
-a[2] = -mass[1]*length[0] * sin(theta[0][i] - theta[1][i])
-a[3] = mass[1]*g * sin(theta[1][i])
+a0 = (mass0 + mass1)*length[0]
+a1 = mass[1]*length[1] * cos(theta[0][i] - theta[1][i])
+a2 = mass[1]*length[1] * sin(theta[0][i] - theta[1][i])
+a3 = g*(mass[0] + mass[1])*sin(theta[0][i]) * time_step**2
 
-b[0] = (mass[0] + mass[1])*length[0]
-b[1] = mass[1]*length[1]*cos(theta[0][i] - theta[1][i])
-b[2] = mass[1]*length[1]*sin(theta[0][i] - theta[1][i])
-b[3] = g * (mass[0] + mass[1])*sin(theta[0][i])
+b0 = mass[1]*length[1]**2
+b1 = mass[1]*length[0] * cos(theta[0][i] - theta[1][i])
+b2 = -mass[1]*length[0] * sin(theta[0][i] - theta[1][i])
+b3 = mass[1]*g * sin(theta[1][i]) * time_step**2
 (source: http://scienceworld.wolfram.com/physics/DoublePendulum.html)
 
 
-The differential terms can be calculated by:
+The differential terms can be approximate by:
 theta_tt = (theta[i+1] - 2*theta[i] + theta[i-1])/time_step**2
 theta_t = (theta[i] - theta[i-1])/time_step
 (Note, the reason I do this for theta_t is to simplify the math)
 
-If you multiply each side by time_step**2, and taylor approximate
-theta_t
+If you multiply each side by time_step**2
 
+You get:
 theta_tt = theta[n][i+1] - 2*theta[n][i] + theta[n][i-1]
 
+The whole equation can essentially be simplified using this equation
 a0 * theta[1][i+1] + a1*theta[0][i] + d0 = 0
 b0 * theta[0][i+1] + b1*theta[1][i] + d1 = 0
 
@@ -102,9 +103,9 @@ if __name__ == "__main__":
     number_of_points = 10000
     time_start = 0
     time_end = 10
-    initial_angles = np.array([90, 90])
+    initial_angles = np.array([180, 175])
     initial_omegas = np.array([0, 0])
-    mass = np.array([0.1, 100])
+    mass = np.array([10, 10])
     length = np.array([1, 1])
 
     times, theta = get_results(time_start, time_end, initial_angles,
