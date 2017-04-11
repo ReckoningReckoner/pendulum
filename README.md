@@ -12,7 +12,7 @@ Similarily, the output for the case where m1 << m0 also appears logical:
 
 The chaoticness of the system can be observed from the following charts:
 ![](outupt/chaotic1.png)
-![](utupt/chaotic1.png)
+![](outupt/chaotic1.png)
 
 Otherwise, these various outputs from the different input parameters
 ![](outupt/cool.png)
