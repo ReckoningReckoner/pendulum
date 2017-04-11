@@ -1,93 +1,95 @@
+"""
+ENGPHYS213 Final Project
+Author: Viraj Bangari
+
+The coupled equations for the ODE are:
+a0 * theta1_tt + a1 * theta0_tt + a2 * theta0_t**2 + a3 = 0
+b0 * theta0_tt + b1 * theta1_tt + b2 * theta1_t**2 + b3
+
+where:
+a0 = (mass0 + mass1)*length[0]
+a1 = mass[1]*length[1] * cos(theta[0][i] - theta[1][i])
+a2 = mass[1]*length[1] * sin(theta[0][i] - theta[1][i])
+a3 = g*(mass[0] + mass[1])*sin(theta[0][i]) * time_step**2
+
+b0 = mass[1]*length[1]**2
+b1 = mass[1]*length[0] * cos(theta[0][i] - theta[1][i])
+b2 = -mass[1]*length[0] * sin(theta[0][i] - theta[1][i])
+b3 = mass[1]*g * sin(theta[1][i]) * time_step**2
+(source: http://scienceworld.wolfram.com/physics/DoublePendulum.html)
+
+The differential terms can be approximate by:
+theta_tt = (theta[i+1] - 2*theta[i] + theta[i-1])/time_step**2
+theta_t = (theta[i] - theta[i-1])/time_step
+(Note, the reason I do this for theta_t is to simplify the math)
+
+If you multiply each side by time_step**2
+You get:
+
+theta_tt = theta[n][i+1] - 2*theta[n][i] + theta[n][i-1]
+The whole equation can essentially be simplified using this equation
+a0 * theta[1][i+1] + a1*theta[0][i] + d0 = 0
+b0 * theta[0][i+1] + b1*theta[1][i] + d1 = 0
+
+Then, the d term can be subtracted. The two theta terms can be
+eliminated using a matrix.
+"""
+
+
 import numpy as np
-from numpy.linalg import norm
-from scipy.constants import g
-
-unit_i = np.array([1.0, 0.0])
-unit_j = np.array([0.0, 1.0])
+from numpy import sin, cos
+from constants import g
 
 
-def angle_between(v1, v2):
-    costheta = np.dot(v1, v2)/norm(v1)/norm(v2)
-    return np.arccos(costheta)
+def set_initial_conditions(theta, initial_angle, initial_omega, time_step):
+    theta[:, 1] = np.deg2rad(initial_angle[:])
+    theta[:, 0] = theta[:, 1] - initial_omega[:] * time_step
 
 
-class Pendulum:
+def dterm_2nddiff(theta, i):
+    return -2*theta[i] + theta[i-1]
 
-    def __init__(self, length, theta, mass):
-        self.mass = mass
-        self.theta = theta
-        self.length = length
-        self.acceleration = np.array([0.0, 0.0])  # Z component
-        self.velocity = np.array([0.0, 0.0])      # Z component
-        self.I = self.mass * length ** 2
-        self.prev = None
-        self.next = None
 
-        self.moment =\
-            self.length * np.array([np.sin(self.theta), np.cos(self.theta)])
+def dterm_1stdiff(theta, i):
+    return (theta[i] - theta[i-1])**2
 
-    def attach_to(self, pendulum):
-        self.prev = pendulum
-        pendulum.next = self
 
-    def gravity(self):
-        return unit_j * self.mass * g
+def _d_term(theta1, theta2, a, i):
+    return a[0] * dterm_2nddiff(theta1, i)\
+            + a[1] * dterm_2nddiff(theta2, i)\
+            + a[2] * dterm_1stdiff(theta2, i)\
+            + a[3]
 
-    def update_moment(self):
-        self.moment =\
-            self.length * np.array([np.sin(self.theta), np.cos(self.theta)])
 
-    def tension(self):
-        tension_mag = self.mass * g * np.cos(self.theta)\
-                      + self.mass *\
-                      norm(self.velocity) ** 2/self.length
+def simulate(time_start, time_end, initial_angles,
+             initial_omegas, mass, length, number_of_points):
 
-        if self.next:
-            tension_mag -= norm(self.next.tension()) *\
-                    np.cos(-self.theta + self.next.theta)
+    theta = np.zeros((2, number_of_points))
+    times = np.linspace(time_start, time_end, number_of_points)
+    time_step = (time_start + time_end)/number_of_points
+    set_initial_conditions(theta, initial_angles, initial_omegas, time_step)
 
-        # print("Grav", self.mass * g * np.cos(self.theta))
-        # print("Tension", tension_mag)
-        # print("Cent", self.mass * norm(self.velocity)**2 / self.length)
-        return np.abs(tension_mag) * -self.moment/norm(self.moment)
+    a = np.zeros(4)
+    b = np.zeros(4)
+    d = np.zeros(2)
+    for i in range(1, number_of_points - 1):
+        a[0] = (mass[0] + mass[1])*length[0]
+        a[1] = mass[1]*length[1] * cos(theta[0][i] - theta[1][i])
+        a[2] = mass[1]*length[1] * sin(theta[0][i] - theta[1][i])
+        a[3] = g*(mass[0] + mass[1])*sin(theta[0][i]) * time_step**2
 
-    def update_acceleration(self, dt):
-        gravity = self.gravity()
-        tension = self.tension()
-        net_force = gravity + tension
-        if self.next is not None:
-            tension += -self.next.tension()
+        b[0] = mass[1]*length[1]**2
+        b[1] = mass[1]*length[0] * cos(theta[0][i] - theta[1][i])
+        b[2] = -mass[1]*length[0] * sin(theta[0][i] - theta[1][i])
+        b[3] = mass[1]*g * sin(theta[1][i]) * time_step**2
 
-        self.acceleration = net_force/self.mass
+        d[0] = _d_term(theta[0], theta[1], a, i)
+        d[1] = _d_term(theta[1], theta[0], b, i)
 
-    def update_velocity(self, dt):
-        self.velocity += self.acceleration * dt
-        # if self.prev:
-        #     self.velocity += self.prev.velocity
+        # Matrix returns theta 0, then theta1
+        ab_matrix = np.array([[a[0], a[1]],
+                              [b[1], b[0]]])
 
-    def update_position(self, dt):
-        print("Old theta", self.theta)
+        theta[0][i+1], theta[1][i+1] = np.linalg.solve(ab_matrix, -d)
 
-        self.moment += self.velocity * dt
-        self.moment *= self.length/norm(self.moment)
-        self.theta = angle_between(self.moment, unit_j)
-        if self.moment[0] < 0 and not self.theta < 0:
-            self.theta *= -1
-        elif self.moment[0] > 0 and not self.theta > 0:
-            self.theta *= -1
-
-        print("New theta", self.theta)
-
-    def update_velocity_and_position(self, dt):
-        # print("Old Moment", self.moment)
-        # print("Old Theta", np.rad2deg(self.theta))
-        # print("length/moment", self.length/norm(self.moment))
-
-        self.update_moment()
-        self.update_acceleration(dt)
-        self.update_velocity(dt)
-        self.update_position(dt)
-
-        # print("New Moment", self.moment)
-        # print("Moment X", self.moment[0])
-        # print("Moment y", self.moment[1])
+    return times, theta
