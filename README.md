@@ -16,5 +16,5 @@ The chaoticness of the system can be observed from the following charts:
 
 Otherwise, these various outputs from the different input parameters
 ![](outupt/cool.png)
-![](cool2.png)
-![](cool3.png)
+![](outupt/cool2.png)
+![](outupt/cool3.png)
